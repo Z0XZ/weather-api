@@ -30,7 +30,7 @@ SECRET_KEY = env.str("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = [
-    ".herokuapp.com/",
+    "weather-api-5dacc653a19f.herokuapp.com",
     "localhost",
     "127.0.0.1",
 ]

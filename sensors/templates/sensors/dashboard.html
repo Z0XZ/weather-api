@@ -8,112 +8,50 @@
     <style>
       body {
         font-family: sans-serif;
-        max-width: 800px;
+        padding: 1rem;
+        max-width: 1200px;
         margin: 2rem auto;
       }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 2rem;
+        align-items: start; /* hindrer at kortene “strekker” hverandre */
+      }
+      .card {
+        border: 1px solid #ccc;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        font-size: clamp(0.95rem, 2vw, 1.1rem);
+      }
+      .card h1 {
+        font-size: 1.4em;
+      }
+
+      .card p {
+        font-size: 1em;
+      }
       canvas {
-        margin-top: 2rem;
+        width: 100% !important;
+        margin-top: 1rem;
+        aspect-ratio: 16 / 9;
+        display: block;
+      }
+      @media (min-width: 1000px) {
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Temperatur over tid</h1>
-    <p>ESP32: <code>esp32-a1b2c3</code></p>
-
-    <canvas id="tempChart" height="100"></canvas>
-    <a href="/api/sensor-data/export.csv?field=temperature">Last ned temperatur som CSV</a>
-
-    <script>
-      async function loadChart() {
-        const res = await fetch('/api/sensor-data/plot/?esp_id=esp32-a1b2c3&field=temperature');
-        const result = await res.json();
-
-        // Konverter x til JS Date-objekt
-        result.data = result.data.map((p) => ({
-          x: new Date(p.x),
-          y: p.y,
-        }));
-        const timestamps = result.data.map((p) => p.x);
-
-        // Finn første og siste tidspunkt
-        const minTime = Math.min(...timestamps);
-        const maxTime = Math.max(...timestamps);
-        const timeSpan = maxTime - minTime;
-
-        // Legg til 5 % luft
-        const padding = timeSpan * 0.05;
-        const xMin = new Date(minTime - padding);
-        const xMax = new Date(maxTime + padding);
-
-        // Finn min/max y-verdi
-        const yValues = result.data.map((p) => p.y);
-        const minY = Math.min(...yValues);
-        const maxY = Math.max(...yValues);
-        const ySpan = maxY - minY;
-
-        // Legg til 5 % luft
-        const yPadding = ySpan * 0.05;
-        const yMin = minY - yPadding;
-        const yMax = maxY + yPadding;
-
-        const ctx = document.getElementById('tempChart').getContext('2d');
-
-        new Chart(ctx, {
-          type: 'line',
-          data: {
-            datasets: [
-              {
-                label: 'Temperatur (°C)',
-                data: result.data,
-                borderColor: 'royalblue',
-                backgroundColor: 'lightblue',
-                fill: false,
-                tension: 0.3,
-                pointRadius: 3,
-              },
-            ],
-          },
-          options: {
-            parsing: false,
-            responsive: true,
-            plugins: {
-              title: {
-                display: true,
-                text: 'Siste målinger fra ESP32',
-              },
-            },
-            scales: {
-              x: {
-                type: 'time',
-                min: xMin,
-                max: xMax,
-                time: {
-                  tooltipFormat: 'yyyy-MM-dd HH:mm',
-                  displayFormats: {
-                    minute: 'HH:mm',
-                    hour: 'dd.MM HH:mm',
-                  },
-                },
-                title: {
-                  display: true,
-                  text: 'Tid',
-                },
-              },
-              y: {
-                beginAtZero: false,
-                min: yMin,
-                max: yMax,
-                title: {
-                  display: true,
-                  text: 'Temperatur (°C)',
-                },
-              },
-            },
-          },
-        });
-      }
-
-      loadChart();
-    </script>
+    <div class="grid">
+      <div class="card">{% include "sensors/graph_temp.html" %}</div>
+      <div class="card">{% include "sensors/graph_humid.html" %}</div>
+      <div class="card">{% include "sensors/graph_pressure.html" %}</div>
+      <div class="card">{% include "sensors/graph_light.html" %}</div>
+    </div>
   </body>
 </html>

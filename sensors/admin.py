@@ -8,11 +8,12 @@ class SensorDataAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "esp_id",
+        "location",
         "temperature",
         "humidity",
         "pressure",
         "light",
-        "created_at",
+        "timestamp",
     )  # Add all the fields you want to see in the list view
 
     # Controls the fields displayed when editing/creating a Group (form view)
@@ -23,6 +24,7 @@ class SensorDataAdmin(admin.ModelAdmin):
                 "fields": (
                     "esp_id",
                     "temperature",
+                    "location",
                     "humidity",
                     "pressure",
                     "light",

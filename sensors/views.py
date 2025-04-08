@@ -31,9 +31,9 @@ class SensorDataView(APIView):
     def get(self, request):
         esp_id = request.query_params.get("esp_id", None)
         if esp_id:
-            data = SensorData.objects.filter(esp_id=esp_id).order_by("-created_at")
+            data = SensorData.objects.filter(esp_id=esp_id).order_by("-timestamp")
         else:
-            data = SensorData.objects.order_by("-created_at")
+            data = SensorData.objects.order_by("-timestamp")
         serializer = SensorDataSerializer(data, many=True)
         return Response(serializer.data)
 
@@ -49,7 +49,7 @@ def plot_data_json(request):
     if not esp_id or not field:
         return JsonResponse({"error": "esp_id og field må være angitt"}, status=400)
 
-    data = SensorData.objects.filter(esp_id=esp_id).order_by("-created_at")[:50]
+    data = SensorData.objects.filter(esp_id=esp_id).order_by("-timestamp")[:50]
     data = reversed(data)  # sorterer i riktig rekkefølge
 
     datapoints = []
@@ -58,7 +58,7 @@ def plot_data_json(request):
         if value is not None:
             datapoints.append(
                 {
-                    "x": d.created_at.isoformat(),
+                    "x": d.timestamp.isoformat(),
                     "y": float(value),
                 }
             )
@@ -74,9 +74,16 @@ def export_csv(request):
     if esp_id:
         data = data.filter(esp_id=esp_id)
     if field:
-        header = ["created_at", field]
+        header = ["timestamp", field]
     else:
-        header = ["created_at", "temperature", "humidity", "pressure", "light"]
+        header = [
+            "timestamp",
+            "location",
+            "temperature",
+            "humidity",
+            "pressure",
+            "light",
+        ]
 
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = f'attachment; filename="sensor_data.csv"'
@@ -86,10 +93,10 @@ def export_csv(request):
 
     for d in data:
         if field:
-            writer.writerow([d.created_at, getattr(d, field)])
+            writer.writerow([d.timestamp, getattr(d, field)])
         else:
             writer.writerow(
-                [d.created_at, d.temperature, d.humidity, d.pressure, d.light]
+                [d.timestamp, d.temperature, d.humidity, d.pressure, d.light]
             )
 
     return response

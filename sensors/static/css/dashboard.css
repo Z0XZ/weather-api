@@ -3,6 +3,7 @@ body {
         padding: 1rem;
         max-width: 1200px;
         margin: 2rem auto;
+        text-align: center;
 }
 .grid {
         display: grid;
@@ -10,6 +11,17 @@ body {
         gap: 2rem;
         align-items: start; /* hindrer at kortene “strekker” hverandre */
 }
+.location-filter {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .location-filter label {
+    margin-right: 1rem;
+  }
+
 .card {
         border: 1px solid #ccc;
         padding: 1.5rem;
@@ -17,6 +29,7 @@ body {
         border-radius: 10px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         font-size: clamp(0.95rem, 2vw, 1.1rem);
+        text-align: center;
 }
 .card h1 {
         font-size: 1.4em;
@@ -31,6 +44,32 @@ canvas {
         aspect-ratio: 16 / 9;
         display: block;
 }
+
+.button-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: royalblue;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+  }
+  
+  .button-link:hover {
+    background-color: #274b8a;
+  }
+  
+  .button-link .icon {
+    width: 1.2em;
+    height: 1.2em;
+    fill: white;
+  }
 
 @media (min-width: 1000px) {
     .grid {

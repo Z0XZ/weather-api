@@ -39,17 +39,40 @@ class SensorDataView(APIView):
 
 
 def dashboard_view(request):
-    return render(request, "sensors/dashboard.html")
+    fields = ["temperature", "humidity", "pressure", "light"]
+    field_labels = {
+        "temperature": "Temperatur",
+        "humidity": "Luftfuktighet",
+        "pressure": "Trykk",
+        "light": "Lys",
+    }
+
+    # Lag en liste med dictionaries som inneholder både felt og oversettelse
+    field_data = [{"key": f, "label": field_labels[f]} for f in fields]
+
+    return render(
+        request,
+        "sensors/dashboard.html",
+        {
+            "locations": ["Sandnes", "Stavanger"],
+            "field_data": field_data,  # 👈 send liste med både key og label
+        },
+    )
 
 
 def plot_data_json(request):
     esp_id = request.GET.get("esp_id")
     field = request.GET.get("field")
+    location = request.GET.get("location")
 
     if not esp_id or not field:
         return JsonResponse({"error": "esp_id og field må være angitt"}, status=400)
 
-    data = SensorData.objects.filter(esp_id=esp_id).order_by("-timestamp")[:50]
+    data = SensorData.objects.filter(esp_id=esp_id)
+    if location:
+        data = data.filter(location__iexact=location)
+
+    data = data.order_by("-timestamp")[:50]
     data = reversed(data)  # sorterer i riktig rekkefølge
 
     datapoints = []
@@ -96,7 +119,14 @@ def export_csv(request):
             writer.writerow([d.timestamp, getattr(d, field)])
         else:
             writer.writerow(
-                [d.timestamp, d.temperature, d.humidity, d.pressure, d.light]
+                [
+                    d.timestamp,
+                    d.location,
+                    d.temperature,
+                    d.humidity,
+                    d.pressure,
+                    d.light,
+                ]
             )
 
     return response

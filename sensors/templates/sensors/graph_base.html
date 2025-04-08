@@ -1,0 +1,90 @@
+<h1>{{ field_label }} over tid</h1>
+<p>Sensorplassering: {{ location }}</p>
+
+<canvas id="chart-{{ field }}-{{ location }}"></canvas>
+
+<a class="button-link" href="/api/sensor-data/export.csv?field={{ field }}&location={{ location }}">
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="currentColor">
+    <path
+      d="M3 14a1 1 0 011-1h3v-4h4v4h3a1 1 0 011 1v3H3v-3zM9 1a1 1 0 012 0v8.586l2.293-2.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4A1 1 0 015.707 7.293L8 9.586V1z"
+    />
+  </svg>
+  Last ned {{ field_label }}-data
+</a>
+
+<script>
+  async function loadChart_{{ field }}_{{ location }}() {
+    const res = await fetch(`/api/sensor-data/plot/?esp_id=esp32-a1b2c3&field={{ field }}&location={{ location }}`);
+    const result = await res.json();
+
+    const data = result.data.map((p) => ({
+      x: new Date(p.x),
+      y: p.y,
+    }));
+
+    const ctx = document.getElementById("chart-{{ field }}-{{ location }}").getContext("2d");
+
+    const timestamps = data.map((p) => p.x);
+    const minTime = Math.min(...timestamps);
+    const maxTime = Math.max(...timestamps);
+    const padding = (maxTime - minTime) * 0.05;
+
+    const yValues = data.map(p => p.y);
+    const yMin = Math.min(...yValues) - (Math.max(...yValues) - Math.min(...yValues)) * 0.05;
+    const yMax = Math.max(...yValues) + (Math.max(...yValues) - Math.min(...yValues)) * 0.05;
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            data: data,
+            borderColor: 'royalblue',
+            backgroundColor: 'lightblue',
+            fill: false,
+            tension: 0.3,
+            pointRadius: 3,
+          },
+        ],
+      },
+      options: {
+        parsing: false,
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: { label: () => '' }
+          }
+        },
+        scales: {
+          x: {
+            type: 'time',
+            min: new Date(minTime - padding),
+            max: new Date(maxTime + padding),
+            time: {
+              tooltipFormat: 'yyyy-MM-dd HH:mm',
+              displayFormats: {
+                minute: 'HH:mm',
+                hour: 'dd.MM HH:mm',
+              },
+            },
+            title: {
+              display: true,
+              text: 'Tid',
+            },
+          },
+          y: {
+            min: yMin,
+            max: yMax,
+            title: {
+              display: true,
+              text: '{{ field_label }}',
+            },
+          },
+        },
+      }
+    });
+  }
+
+  loadChart_{{ field }}_{{ location }}();
+</script>

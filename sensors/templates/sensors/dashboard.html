@@ -34,8 +34,27 @@
           y: p.y,
         }));
         const timestamps = result.data.map((p) => p.x);
-        const xMin = new Date(Math.min(...timestamps));
-        const xMax = new Date(Math.max(...timestamps));
+
+        // Finn første og siste tidspunkt
+        const minTime = Math.min(...timestamps);
+        const maxTime = Math.max(...timestamps);
+        const timeSpan = maxTime - minTime;
+
+        // Legg til 5 % luft
+        const padding = timeSpan * 0.05;
+        const xMin = new Date(minTime - padding);
+        const xMax = new Date(maxTime + padding);
+
+        // Finn min/max y-verdi
+        const yValues = result.data.map((p) => p.y);
+        const minY = Math.min(...yValues);
+        const maxY = Math.max(...yValues);
+        const ySpan = maxY - minY;
+
+        // Legg til 5 % luft
+        const yPadding = ySpan * 0.05;
+        const yMin = minY - yPadding;
+        const yMax = maxY + yPadding;
 
         const ctx = document.getElementById('tempChart').getContext('2d');
 
@@ -82,6 +101,8 @@
               },
               y: {
                 beginAtZero: false,
+                min: yMin,
+                max: yMax,
                 title: {
                   display: true,
                   text: 'Temperatur (°C)',

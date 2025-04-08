@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="no">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ESP32 Temperaturgraf</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 800px;
+        margin: 2rem auto;
+      }
+      canvas {
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Temperatur over tid</h1>
+    <p>ESP32: <code>esp32-a1b2c3</code></p>
+
+    <canvas id="tempChart" height="100"></canvas>
+    <a href="/api/sensor-data/export.csv?field=temperature">Last ned temperatur som CSV</a>
+
+    <script>
+      async function loadChart() {
+        const res = await fetch('/api/sensor-data/plot/?esp_id=esp32-a1b2c3&field=temperature');
+        const result = await res.json();
+
+        // Konverter x til JS Date-objekt
+        result.data = result.data.map((p) => ({
+          x: new Date(p.x),
+          y: p.y,
+        }));
+        const timestamps = result.data.map((p) => p.x);
+        const xMin = new Date(Math.min(...timestamps));
+        const xMax = new Date(Math.max(...timestamps));
+
+        const ctx = document.getElementById('tempChart').getContext('2d');
+
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            datasets: [
+              {
+                label: 'Temperatur (°C)',
+                data: result.data,
+                borderColor: 'royalblue',
+                backgroundColor: 'lightblue',
+                fill: false,
+                tension: 0.3,
+                pointRadius: 3,
+              },
+            ],
+          },
+          options: {
+            parsing: false,
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Siste målinger fra ESP32',
+              },
+            },
+            scales: {
+              x: {
+                type: 'time',
+                min: xMin,
+                max: xMax,
+                time: {
+                  tooltipFormat: 'yyyy-MM-dd HH:mm',
+                  displayFormats: {
+                    minute: 'HH:mm',
+                    hour: 'dd.MM HH:mm',
+                  },
+                },
+                title: {
+                  display: true,
+                  text: 'Tid',
+                },
+              },
+              y: {
+                beginAtZero: false,
+                title: {
+                  display: true,
+                  text: 'Temperatur (°C)',
+                },
+              },
+            },
+          },
+        });
+      }
+
+      loadChart();
+    </script>
+  </body>
+</html>

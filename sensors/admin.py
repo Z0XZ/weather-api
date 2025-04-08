@@ -21,13 +21,11 @@ class SensorDataAdmin(admin.ModelAdmin):
             None,
             {
                 "fields": (
-                    "id",
                     "esp_id",
                     "temperature",
                     "humidity",
                     "pressure",
                     "light",
-                    "created_at",
                 )  # Add all fields you want in the form
             },
         ),

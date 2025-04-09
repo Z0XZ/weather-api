@@ -85,7 +85,7 @@ def plot_data_json(request):
     if location:
         data = data.filter(location__iexact=location)
 
-    data = data.order_by("-timestamp")[:50]
+    data = data.order_by("-timestamp") # kan slice denne for å avgrense antall datapunkter.
     data = reversed(data)  # sorterer i riktig rekkefølge
 
     datapoints = []

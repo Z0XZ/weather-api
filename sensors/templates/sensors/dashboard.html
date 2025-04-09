@@ -11,8 +11,6 @@
   </head>
   <body>
     <h1>Værstasjonsdata for fysikkprosjekt</h1>
-    <p>Laget av: Jon Bjarne Bø & Thomas Angell Storhaug</p>
-
     <fieldset class="filter-controls">
       <legend>Filtrering:</legend>
 
@@ -22,7 +20,8 @@
         <label><input type="checkbox" value="Stavanger" checked /> Stavanger</label>
       </div>
 
-      {% comment %} <div class="filter-group">
+      {% comment %}
+      <div class="filter-group">
         <label for="global-range"><strong>Velg periode:</strong></label
         ><br />
         <select id="global-range">
@@ -30,7 +29,8 @@
           <option value="month" selected>Denne måneden</option>
           <option value="year">Dette året</option>
         </select>
-      </div> {% endcomment %}
+      </div>
+      {% endcomment %}
       <div class="filter-group">
         <label for="global-range"><strong>Valgt periode:</strong></label>
         <select id="global-range">
@@ -40,7 +40,7 @@
           <option value="custom">Egendefinert periode</option>
         </select>
       </div>
-      
+
       <div class="filter-group" id="egendefinert">
         <label><strong>Egendefinert periode:</strong></label>
         <input type="date" id="start-date" />
@@ -64,5 +64,22 @@
       </svg>
       Last ned hele datasettet
     </a>
+    <footer class="site-footer">
+      <div class="footer-content">
+        <p>Laget av: Jon Bjarne Bø & Thomas Angell Storhaug</p>
+        <nav class="footer-links">
+            <a href="https://github.com/Z0XZ/weather-api" target="_blank" aria-label="GitHub">
+                <svg class="footer-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .5C5.73.5.5 5.73.5 12a11.5 11.5 0 008 10.94c.58.1.79-.25.79-.56v-2.17c-3.25.7-3.93-1.56-3.93-1.56-.53-1.33-1.3-1.68-1.3-1.68-1.07-.73.08-.71.08-.71 1.18.08 1.8 1.2 1.8 1.2 1.05 1.8 2.75 1.28 3.42.98.11-.76.41-1.28.75-1.57-2.6-.3-5.33-1.3-5.33-5.79 0-1.28.46-2.33 1.2-3.15-.12-.3-.52-1.5.12-3.15 0 0 .98-.31 3.2 1.2a11.13 11.13 0 015.82 0C17.82 5.2 18.8 5.5 18.8 5.5c.64 1.65.24 2.85.12 3.15.74.82 1.2 1.87 1.2 3.15 0 4.5-2.74 5.49-5.35 5.78.42.36.8 1.07.8 2.15v3.18c0 .31.2.66.8.56A11.5 11.5 0 0023.5 12C23.5 5.73 18.27.5 12 .5z"/>
+                </svg>
+            </a>
+            <a href="mailto:jonbjarnebo@gmail.com" aria-label="E-post">
+                <svg class="footer-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6c0-1.1.9-2 2-2zm0 2v.01L12 13l8-6.99V6H4zm0 12h16V8l-8 6-8-6v10z"/>
+                </svg>
+            </a>
+        </nav>
+      </div>
+    </footer>
   </body>
 </html>

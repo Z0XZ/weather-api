@@ -9,7 +9,7 @@
       d="M3 14a1 1 0 011-1h3v-4h4v4h3a1 1 0 011 1v3H3v-3zM9 1a1 1 0 012 0v8.586l2.293-2.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4A1 1 0 015.707 7.293L8 9.586V1z"
     />
   </svg>
-  Last ned {{ field_label }}-data
+  Last ned {{ field_label }}data
 </a>
 
 <script>
@@ -53,7 +53,15 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            callbacks: { label: () => '' }
+            callbacks: {
+              label: function(context) {
+                return '{{ field_label }}: ' + context.parsed.y + '{{ unit }}';
+              },
+              title: function(context) {
+                const ts = context[0].parsed.x;
+                return new Date(ts).toLocaleString('no-NO');  // norsk datoformat
+              }
+            }
           }
         },
         scales: {

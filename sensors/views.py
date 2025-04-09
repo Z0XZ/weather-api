@@ -40,22 +40,35 @@ class SensorDataView(APIView):
 
 def dashboard_view(request):
     fields = ["temperature", "humidity", "pressure", "light"]
-    field_labels = {
-        "temperature": "Temperatur",
-        "humidity": "Luftfuktighet",
+    units = {
+        "temperature": "°C",
+        "humidity": "%",
         "pressure": "Trykk",
         "light": "Lys",
     }
+    field_labels = {
+        "temperature": "Temperatur",
+        "humidity": "Luftfuktighet",
+        "pressure": "Pa",
+        "light": "",
+    }
 
     # Lag en liste med dictionaries som inneholder både felt og oversettelse
-    field_data = [{"key": f, "label": field_labels[f]} for f in fields]
+    field_data = [
+        {
+            "key": f,
+            "label": field_labels[f],
+            "unit": units[f],
+        }
+        for f in fields
+    ]
 
     return render(
         request,
         "sensors/dashboard.html",
         {
             "locations": ["Sandnes", "Stavanger"],
-            "field_data": field_data,  # 👈 send liste med både key og label
+            "field_data": field_data,  # send liste med både key og label
         },
     )
 

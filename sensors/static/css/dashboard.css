@@ -45,7 +45,7 @@ body {
         flex-wrap: wrap;
 }
 
-.filter-controls select {
+.filter-controls select, input {
         padding: 0.5rem 1rem;
         font-size: 1rem;
         border-radius: 6px;
@@ -54,12 +54,16 @@ body {
         color: #333;
         cursor: pointer;
         transition: border-color 0.3s ease;
-      }
-      
-      .filter-controls select:focus {
-        outline: none;
-        border-color: royalblue;
-      }
+}
+
+.filter-controls select:focus, input:focus {
+outline: none;
+border-color: royalblue;
+}
+
+#egendefinert {
+        display: none;
+}
 
 .card {
         border: 1px solid #ccc;

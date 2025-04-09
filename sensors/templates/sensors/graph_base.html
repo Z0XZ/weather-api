@@ -13,129 +13,137 @@
 </a>
 
 <script>
-  // Lag globale variabler
-  window.allData_{{ field }}_{{ location }} = [];
-  window.chart_{{ field }}_{{ location }} = null;
+    // Lag globale variabler
+    window.allData_{{ field }}_{{ location }} = [];
+    window.chart_{{ field }}_{{ location }} = null;
 
-  // Gjør funksjonen global med window.
-  window.loadChart_{{ field }}_{{ location }} = async function () {
-    const url = `/api/sensor-data/plot/?esp_id=esp32-a1b2c3&field={{ field }}&location={{ location }}`;
-    const res = await fetch(url);
-    const result = await res.json();
+    // Gjør funksjonen global med window.
+    window.loadChart_{{ field }}_{{ location }} = async function () {
+      // Hent valgt periode fra dropdown
+      const range = document.getElementById("global-range").value;
+      const startDate = document.getElementById("start-date").value;
+      const endDate = document.getElementById("end-date").value;
 
-    // Lagre alle data som Date-objekter globalt
-    const allData = result.data.map((p) => ({
-      x: new Date(p.x),
-      y: p.y,
-    }));
-    window.allData_{{ field }}_{{ location }} = allData;
+      let url = `/api/sensor-data/plot/?esp_id=esp32-a1b2c3&field={{ field }}&location={{ location }}`;
+      if (range) {
+        url += `&range=${range}`;
+      } else if (startDate || endDate) {
+        if (startDate) url += `&start=${startDate}`;
+        if (endDate) url += `&end=${endDate}`;
+  }
+      const res = await fetch(url);
+      const result = await res.json();
 
-    // Hent valgt periode fra dropdown
-    const range = document.getElementById("global-range").value;
+      // Lagre alle data som Date-objekter globalt
+      const allData = result.data.map((p) => ({
+        x: new Date(p.x),
+        y: p.y,
+      }));
+      window.allData_{{ field }}_{{ location }} = allData;
 
-    // Filtrering
-    function filterData(data, range) {
-      const now = new Date();
+      // Filtrering
+      function filterData(data, range) {
+        const now = new Date();
 
-      if (range === 'day') {
-        return data.filter(p => p.x.toDateString() === now.toDateString());
+        if (range === 'day') {
+          return data.filter(p => p.x.toDateString() === now.toDateString());
 
-      } else if (range === 'month') {
-        return data.filter(p =>
-          p.x.getFullYear() === now.getFullYear() &&
-          p.x.getMonth() === now.getMonth()
-        );
+        } else if (range === 'month') {
+          return data.filter(p =>
+            p.x.getFullYear() === now.getFullYear() &&
+            p.x.getMonth() === now.getMonth()
+          );
 
-      } else if (range === 'year') {
-        return data.filter(p => p.x.getFullYear() === now.getFullYear());
+        } else if (range === 'year') {
+          return data.filter(p => p.x.getFullYear() === now.getFullYear());
+        }
+
+        return data;
       }
 
-      return data;
-    }
+      const filtered = filterData(allData, range);
+      if (filtered.length === 0) return; // Unngå krasj
 
-    const filtered = filterData(allData, range);
-    if (filtered.length === 0) return; // Unngå krasj
+      const ctx = document.getElementById("chart-{{ field }}-{{ location }}").getContext("2d");
 
-    const ctx = document.getElementById("chart-{{ field }}-{{ location }}").getContext("2d");
+      // Fjern eksisterende graf før ny
+      if (window.chart_{{ field }}_{{ location }}) {
+        window.chart_{{ field }}_{{ location }}.destroy();
+      }
 
-    // Fjern eksisterende graf før ny
-    if (window.chart_{{ field }}_{{ location }}) {
-      window.chart_{{ field }}_{{ location }}.destroy();
-    }
+      // Skaleringsdata
+      const timestamps = filtered.map((p) => p.x);
+      const minTime = Math.min(...timestamps);
+      const maxTime = Math.max(...timestamps);
+      const padding = (maxTime - minTime) * 0.05;
 
-    // Skaleringsdata
-    const timestamps = filtered.map((p) => p.x);
-    const minTime = Math.min(...timestamps);
-    const maxTime = Math.max(...timestamps);
-    const padding = (maxTime - minTime) * 0.05;
+      const yValues = filtered.map(p => p.y);
+      const yMin = Math.min(...yValues) - (Math.max(...yValues) - Math.min(...yValues)) * 0.05;
+      const yMax = Math.max(...yValues) + (Math.max(...yValues) - Math.min(...yValues)) * 0.05;
 
-    const yValues = filtered.map(p => p.y);
-    const yMin = Math.min(...yValues) - (Math.max(...yValues) - Math.min(...yValues)) * 0.05;
-    const yMax = Math.max(...yValues) + (Math.max(...yValues) - Math.min(...yValues)) * 0.05;
-
-    // Opprett ny graf
-    window.chart_{{ field }}_{{ location }} = new Chart(ctx, {
-      type: 'line',
-      data: {
-        datasets: [
-          {
-            data: filtered,
-            borderColor: 'royalblue',
-            backgroundColor: 'lightblue',
-            fill: false,
-            tension: 0.3,
-            pointRadius: 3,
-          },
-        ],
-      },
-      options: {
-        parsing: false,
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return '{{ field_label }}: ' + context.parsed.y + ' {{ unit }}';
-              },
-              title: function(context) {
-                const ts = context[0].parsed.x;
-                return new Date(ts).toLocaleString('no-NO');
+      // Opprett ny graf
+      window.chart_{{ field }}_{{ location }} = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              data: filtered,
+              borderColor: 'royalblue',
+              backgroundColor: 'lightblue',
+              fill: false,
+              tension: 0.3,
+              pointRadius: 3,
+            },
+          ],
+        },
+        options: {
+          parsing: false,
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return '{{ field_label }}: ' + context.parsed.y + ' {{ unit }}';
+                },
+                title: function(context) {
+                  const ts = context[0].parsed.x;
+                  return new Date(ts).toLocaleString('no-NO');
+                }
               }
             }
-          }
-        },
-        scales: {
-          x: {
-            type: 'time',
-            min: new Date(minTime - padding),
-            max: new Date(maxTime + padding),
-            time: {
-              tooltipFormat: 'yyyy-MM-dd HH:mm',
-              displayFormats: {
-                minute: 'HH:mm',
-                hour: 'dd.MM HH:mm',
+          },
+          scales: {
+            x: {
+              type: 'time',
+              min: new Date(minTime - padding),
+              max: new Date(maxTime + padding),
+              time: {
+                tooltipFormat: 'yyyy-MM-dd HH:mm',
+                displayFormats: {
+                  minute: 'HH:mm',
+                  hour: 'dd.MM HH:mm',
+                },
+              },
+              title: {
+                display: true,
+                text: 'Tid',
               },
             },
-            title: {
-              display: true,
-              text: 'Tid',
+            y: {
+              min: yMin,
+              max: yMax,
+              title: {
+                display: true,
+                text: `{% if unit %}{{ field_label }} (i {{ unit }}){% else %}{{ field_label }} (verdi fra 0–4095){% endif %}`,
+              },
             },
           },
-          y: {
-            min: yMin,
-            max: yMax,
-            title: {
-              display: true,
-              text: `{% if unit %}{{ field_label }} (i {{ unit }}){% else %}{{ field_label }} (verdi fra 0–4095){% endif %}`,
-            },
-          },
-        },
-      }
-    });
-  };
+        }
+      });
+    };
 
-  // Kjør første gang ved lasting
-  window.loadChart_{{ field }}_{{ location }}();
+    // Kjør første gang ved lasting
+    window.loadChart_{{ field }}_{{ location }}();
 </script>

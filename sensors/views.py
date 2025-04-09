@@ -1,4 +1,5 @@
 from django.utils import timezone
+from datetime import datetime, timedelta
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from rest_framework.views import APIView
@@ -74,10 +75,15 @@ def dashboard_view(request):
     )
 
 
+from datetime import datetime
+
 def plot_data_json(request):
     esp_id = request.GET.get("esp_id")
     field = request.GET.get("field")
     location = request.GET.get("location")
+    range_param = request.GET.get("range")
+    start = request.GET.get("start")
+    end = request.GET.get("end")
 
     if not esp_id or not field:
         return JsonResponse({"error": "esp_id og field må være angitt"}, status=400)
@@ -86,31 +92,38 @@ def plot_data_json(request):
     if location:
         data = data.filter(location__iexact=location)
 
-    range_param = request.GET.get("range")  # f.eks. "day", "month", "year"
-
+    # Forhåndsdefinerte intervaller
     if range_param == "day":
         data = data.filter(timestamp__date=timezone.now().date())
-
     elif range_param == "month":
         now = timezone.now()
         data = data.filter(timestamp__year=now.year, timestamp__month=now.month)
-
     elif range_param == "year":
         data = data.filter(timestamp__year=timezone.now().year)
 
-    data = data.order_by("-timestamp") #kan slice denne for å avgrense antall datapunkter.
-    data = reversed(data)  # sorterer i riktig rekkefølge
+    # Egendefinert periode
+    if start:
+        try:
+            start_dt = datetime.strptime(start, "%Y-%m-%d")
+            data = data.filter(timestamp__gte=start_dt)
+        except ValueError:
+            pass
+
+    if end:
+        try:
+            end_dt = datetime.strptime(end, "%Y-%m-%d") + timedelta(days=1)
+            data = data.filter(timestamp__lt=end_dt)
+        except ValueError:
+            pass
+
+    data = data.order_by("-timestamp")
+    data = reversed(data)
 
     datapoints = []
     for d in data:
         value = getattr(d, field, None)
         if value is not None:
-            datapoints.append(
-                {
-                    "x": d.timestamp.isoformat(),
-                    "y": float(value),
-                }
-            )
+            datapoints.append({"x": d.timestamp.isoformat(), "y": float(value)})
 
     return JsonResponse({"data": datapoints})
 

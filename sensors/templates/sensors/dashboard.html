@@ -22,7 +22,7 @@
         <label><input type="checkbox" value="Stavanger" checked /> Stavanger</label>
       </div>
 
-      <div class="filter-group">
+      {% comment %} <div class="filter-group">
         <label for="global-range"><strong>Velg periode:</strong></label
         ><br />
         <select id="global-range">
@@ -30,6 +30,21 @@
           <option value="month" selected>Denne måneden</option>
           <option value="year">Dette året</option>
         </select>
+      </div> {% endcomment %}
+      <div class="filter-group">
+        <label for="global-range"><strong>Valgt periode:</strong></label>
+        <select id="global-range">
+          <option value="day" selected>I dag</option>
+          <option value="month">Denne måneden</option>
+          <option value="year">Dette året</option>
+          <option value="custom">Egendefinert periode</option>
+        </select>
+      </div>
+      
+      <div class="filter-group" id="egendefinert">
+        <label><strong>Egendefinert periode:</strong></label>
+        <input type="date" id="start-date" />
+        <input type="date" id="end-date" />
       </div>
     </fieldset>
 

@@ -11,16 +11,21 @@ body {
         gap: 2rem;
         align-items: start; /* hindrer at kortene “strekker” hverandre */
 }
-.location-filter {
-    margin-bottom: 2rem;
-    padding: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-  }
+.filter-controls {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+}
 
-  .location-filter label {
-    margin-right: 1rem;
-  }
+.filter-controls label {
+        margin-right: 1rem;
+}
+
+.filter-group {
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+}
 
 .card {
         border: 1px solid #ccc;

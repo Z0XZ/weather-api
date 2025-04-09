@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from rest_framework.views import APIView
@@ -85,7 +86,19 @@ def plot_data_json(request):
     if location:
         data = data.filter(location__iexact=location)
 
-    data = data.order_by("-timestamp") # kan slice denne for å avgrense antall datapunkter.
+    range_param = request.GET.get("range")  # f.eks. "day", "month", "year"
+
+    if range_param == "day":
+        data = data.filter(timestamp__date=timezone.now().date())
+
+    elif range_param == "month":
+        now = timezone.now()
+        data = data.filter(timestamp__year=now.year, timestamp__month=now.month)
+
+    elif range_param == "year":
+        data = data.filter(timestamp__year=timezone.now().year)
+
+    data = data.order_by("-timestamp") #kan slice denne for å avgrense antall datapunkter.
     data = reversed(data)  # sorterer i riktig rekkefølge
 
     datapoints = []

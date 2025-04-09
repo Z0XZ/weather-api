@@ -13,32 +13,73 @@
 </a>
 
 <script>
-  async function loadChart_{{ field }}_{{ location }}() {
-    const res = await fetch(`/api/sensor-data/plot/?esp_id=esp32-a1b2c3&field={{ field }}&location={{ location }}`);
+  // Lag globale variabler
+  window.allData_{{ field }}_{{ location }} = [];
+  window.chart_{{ field }}_{{ location }} = null;
+
+  // Gjør funksjonen global med window.
+  window.loadChart_{{ field }}_{{ location }} = async function () {
+    const url = `/api/sensor-data/plot/?esp_id=esp32-a1b2c3&field={{ field }}&location={{ location }}`;
+    const res = await fetch(url);
     const result = await res.json();
 
-    const data = result.data.map((p) => ({
+    // Lagre alle data som Date-objekter globalt
+    const allData = result.data.map((p) => ({
       x: new Date(p.x),
       y: p.y,
     }));
+    window.allData_{{ field }}_{{ location }} = allData;
+
+    // Hent valgt periode fra dropdown
+    const range = document.getElementById("global-range").value;
+
+    // Filtrering
+    function filterData(data, range) {
+      const now = new Date();
+
+      if (range === 'day') {
+        return data.filter(p => p.x.toDateString() === now.toDateString());
+
+      } else if (range === 'month') {
+        return data.filter(p =>
+          p.x.getFullYear() === now.getFullYear() &&
+          p.x.getMonth() === now.getMonth()
+        );
+
+      } else if (range === 'year') {
+        return data.filter(p => p.x.getFullYear() === now.getFullYear());
+      }
+
+      return data;
+    }
+
+    const filtered = filterData(allData, range);
+    if (filtered.length === 0) return; // Unngå krasj
 
     const ctx = document.getElementById("chart-{{ field }}-{{ location }}").getContext("2d");
 
-    const timestamps = data.map((p) => p.x);
+    // Fjern eksisterende graf før ny
+    if (window.chart_{{ field }}_{{ location }}) {
+      window.chart_{{ field }}_{{ location }}.destroy();
+    }
+
+    // Skaleringsdata
+    const timestamps = filtered.map((p) => p.x);
     const minTime = Math.min(...timestamps);
     const maxTime = Math.max(...timestamps);
     const padding = (maxTime - minTime) * 0.05;
 
-    const yValues = data.map(p => p.y);
+    const yValues = filtered.map(p => p.y);
     const yMin = Math.min(...yValues) - (Math.max(...yValues) - Math.min(...yValues)) * 0.05;
     const yMax = Math.max(...yValues) + (Math.max(...yValues) - Math.min(...yValues)) * 0.05;
 
-    new Chart(ctx, {
+    // Opprett ny graf
+    window.chart_{{ field }}_{{ location }} = new Chart(ctx, {
       type: 'line',
       data: {
         datasets: [
           {
-            data: data,
+            data: filtered,
             borderColor: 'royalblue',
             backgroundColor: 'lightblue',
             fill: false,
@@ -50,6 +91,7 @@
       options: {
         parsing: false,
         responsive: true,
+        maintainAspectRatio: true,
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -59,7 +101,7 @@
               },
               title: function(context) {
                 const ts = context[0].parsed.x;
-                return new Date(ts).toLocaleString('no-NO');  // norsk datoformat
+                return new Date(ts).toLocaleString('no-NO');
               }
             }
           }
@@ -86,13 +128,14 @@
             max: yMax,
             title: {
               display: true,
-              text: `{% if unit %}{{ field_label }} (i {{ unit }}){% else %}{{ field_label }} (verdi fra 0-4095){% endif %}`,
+              text: `{% if unit %}{{ field_label }} (i {{ unit }}){% else %}{{ field_label }} (verdi fra 0–4095){% endif %}`,
             },
           },
         },
       }
     });
-  }
+  };
 
-  loadChart_{{ field }}_{{ location }}();
+  // Kjør første gang ved lasting
+  window.loadChart_{{ field }}_{{ location }}();
 </script>

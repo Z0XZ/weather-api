@@ -12,10 +12,19 @@ body {
         align-items: start; /* hindrer at kortene “strekker” hverandre */
 }
 .filter-controls {
+        display: flex;
         margin-bottom: 2rem;
         padding: 1rem;
         border: 1px solid #ccc;
         border-radius: 8px;
+        background-color: white;
+        align-items: center;
+        justify-content: center;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-wrap: wrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .filter-controls label {
@@ -23,9 +32,34 @@ body {
 }
 
 .filter-group {
-        margin-top: 0.5rem;
-        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin:1rem;
+        padding: auto;
 }
+
+.filter-group .checkboxes {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+}
+
+.filter-controls select {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background-color: white;
+        color: #333;
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+      }
+      
+      .filter-controls select:focus {
+        outline: none;
+        border-color: royalblue;
+      }
 
 .card {
         border: 1px solid #ccc;
@@ -81,5 +115,3 @@ canvas {
         grid-template-columns: repeat(2, 1fr);
     }
 }
-
-/* Tving Heroku til å se at filen er ny */

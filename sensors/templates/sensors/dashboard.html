@@ -21,7 +21,7 @@
     <div class="grid">
       {% for location in locations %} {% for field in field_data %}
       <div class="card location-{{ location }}">
-        {% include "sensors/graph_base.html" with location=location field=field.key field_label=field.label unit=field.unit only%}
+        {% include "sensors/graph_base.html" with location=location field=field.key unit=field.unit field_label=field.label only%}
       </div>
       {% endfor %} {% endfor %}
     </div>

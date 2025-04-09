@@ -43,14 +43,14 @@ def dashboard_view(request):
     units = {
         "temperature": "°C",
         "humidity": "%",
-        "pressure": "Trykk",
-        "light": "Lys",
+        "pressure": "Pa",
+        "light": "",
     }
     field_labels = {
         "temperature": "Temperatur",
         "humidity": "Luftfuktighet",
-        "pressure": "Pa",
-        "light": "",
+        "pressure": "Trykk",
+        "light": "Lys",
     }
 
     # Lag en liste med dictionaries som inneholder både felt og oversettelse

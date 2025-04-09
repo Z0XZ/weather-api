@@ -55,7 +55,7 @@
           tooltip: {
             callbacks: {
               label: function(context) {
-                return '{{ field_label }}: ' + context.parsed.y + '{{ unit }}';
+                return '{{ field_label }}: ' + context.parsed.y + ' {{ unit }}';
               },
               title: function(context) {
                 const ts = context[0].parsed.x;
@@ -86,7 +86,7 @@
             max: yMax,
             title: {
               display: true,
-              text: '{{ field_label }}',
+              text: `{% if unit %}{{ field_label }} (i {{ unit }}){% else %}{{ field_label }} (verdi fra 0-4095){% endif %}`,
             },
           },
         },

@@ -131,10 +131,14 @@ def plot_data_json(request):
 def export_csv(request):
     esp_id = request.GET.get("esp_id")
     field = request.GET.get("field")
+    location = request.GET.get("location")
 
     data = SensorData.objects.all()
     if esp_id:
         data = data.filter(esp_id=esp_id)
+    if location:
+        data = data.filter(location__iexact=location)
+    
     if field:
         header = ["timestamp", field]
     else:

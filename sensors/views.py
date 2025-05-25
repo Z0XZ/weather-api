@@ -12,6 +12,20 @@ import csv
 # Din hemmelige API-nøkkel for ESP
 AUTHORIZED_KEYS = {"esp32-a1b2c3": "abc123esp", "esp32-x9y8z7": "xyz456esp"}
 
+def voltage_to_percent(voltage):
+    if voltage is None:
+        return None
+    if voltage >= 4.20: return 100
+    if voltage >= 4.15: return 95
+    if voltage >= 4.10: return 90
+    if voltage >= 4.00: return 80
+    if voltage >= 3.90: return 70
+    if voltage >= 3.80: return 60
+    if voltage >= 3.70: return 50
+    if voltage >= 3.60: return 30
+    if voltage >= 3.50: return 15
+    if voltage >= 3.40: return 5
+    return 0
 
 class SensorDataView(APIView):
     def post(self, request):
@@ -26,6 +40,11 @@ class SensorDataView(APIView):
 
         serializer = SensorDataSerializer(data=request.data)
         if serializer.is_valid():
+            battery_voltage = request.data.get("battery_voltage")
+            battery_percent = voltage_to_percent(float(battery_voltage)) if battery_voltage else None
+
+            validated_data = serializer.validated_data
+            validated_data["battery"] = battery_percent
             serializer.save()
             return Response({"message": "Data lagret"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

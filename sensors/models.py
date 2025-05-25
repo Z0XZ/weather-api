@@ -10,6 +10,7 @@ class SensorData(models.Model):
     light = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
     battery = models.IntegerField(null=True, blank=True) #Batteriprosent
+    battery_voltage = models.FloatField(null=True, blank=True)  # Målt spenning i volt
 
     def __str__(self):
         return f"{self.timestamp} - {self.esp_id} - {self.temperature}°C"

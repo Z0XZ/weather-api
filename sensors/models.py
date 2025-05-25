@@ -9,6 +9,7 @@ class SensorData(models.Model):
     pressure = models.FloatField()
     light = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    battery = models.IntegerField(null=True, blank=True) #Batteriprosent
 
     def __str__(self):
         return f"{self.timestamp} - {self.esp_id} - {self.temperature}°C"

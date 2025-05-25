@@ -65,12 +65,27 @@ def dashboard_view(request):
         for f in fields
     ]
 
+    # Hent siste batteriverdier per location
+    latest_fill = {}
+    latest_battery = {}
+    for location in ["Sandnes", "Stavanger"]:
+        latest = SensorData.objects.filter(location__iexact=location).order_by("-timestamp").first()
+        if latest and latest.battery is not None:
+            battery_int = int(latest.battery)
+            latest_battery[location] = battery_int
+            latest_fill[location] = int((battery_int / 100) * 18)  # batterifyll bredde i px
+        else:
+            latest_battery[location] = 0
+            latest_fill[location] = 0
+
     return render(
         request,
         "sensors/dashboard.html",
         {
             "locations": ["Sandnes", "Stavanger"],
             "field_data": field_data,  # send liste med både key og label
+            "latest_battery": latest_battery,
+            "latest_fill": latest_fill,
         },
     )
 

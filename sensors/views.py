@@ -8,27 +8,10 @@ from rest_framework import status
 from .models import SensorData
 from .serializers import SensorDataSerializer
 import csv
+from .utils import correct_voltage_for_temperature, voltage_to_percent
 
 # Din hemmelige API-nøkkel for ESP
 AUTHORIZED_KEYS = {"esp32-a1b2c3": "abc123esp", "esp32-x9y8z7": "xyz456esp"}
-
-def voltage_to_percent(voltage):
-    if voltage is None:
-        return None
-    if voltage >= 4.20: return 100
-    if voltage >= 4.15: return 95
-    if voltage >= 4.10: return 90
-    if voltage >= 4.05: return 85
-    if voltage >= 4.00: return 80
-    if voltage >= 3.95: return 75
-    if voltage >= 3.90: return 70
-    if voltage >= 3.85: return 65
-    if voltage >= 3.80: return 60
-    if voltage >= 3.70: return 50
-    if voltage >= 3.60: return 30
-    if voltage >= 3.50: return 15
-    if voltage >= 3.40: return 5
-    return 0
 
 class SensorDataView(APIView):
     def post(self, request):
@@ -92,10 +75,11 @@ def dashboard_view(request):
     latest_battery = {}
     for location in ["Sandnes", "Stavanger"]:
         latest = SensorData.objects.filter(location__iexact=location).order_by("-timestamp").first()
-        if latest and latest.battery is not None:
-            battery_int = int(latest.battery)
+        if latest and latest.battery_voltage and latest.temperature is not None:
+            corrected = correct_voltage_for_temperature(latest.battery_voltage, latest.temperature)
+            battery_int = voltage_to_percent(corrected)
             latest_battery[location] = battery_int
-            latest_fill[location] = int((battery_int / 100) * 18)  # batterifyll bredde i px
+            latest_fill[location] = int((battery_int / 100) * 18) # Batterifyll i pixler
         else:
             latest_battery[location] = 0
             latest_fill[location] = 0

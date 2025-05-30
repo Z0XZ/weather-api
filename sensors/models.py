@@ -11,6 +11,8 @@ class SensorData(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     battery = models.IntegerField(null=True, blank=True) #Batteriprosent
     battery_voltage = models.FloatField(null=True, blank=True)  # Målt spenning i volt
+    wind_freq = models.FloatField(null=True, blank=True, help_text="Frekvens fra vindmåler (Hz)")
+    wind_speed = models.FloatField(null=True, blank=True, help_text="Vindhastighet beregnet fra frekvens (m/s)")
 
     def __str__(self):
         return f"{self.timestamp} - {self.esp_id} - {self.temperature}°C"

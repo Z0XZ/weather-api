@@ -46,18 +46,22 @@ class SensorDataView(APIView):
 
 
 def dashboard_view(request):
-    fields = ["temperature", "humidity", "pressure", "light"]
+    fields = ["temperature", "humidity", "pressure", "light", "wind_freq", "wind_speed"]
     units = {
         "temperature": "°C",
         "humidity": "%",
         "pressure": "Pa",
         "light": "",
+        "wind_freq": "Hz",
+        "wind_speed": "m/s",
     }
     field_labels = {
         "temperature": "Temperatur",
         "humidity": "Luftfuktighet",
         "pressure": "Trykk",
         "light": "Lys",
+        "wind_freq": "Vindfrekvens",
+        "wind_speed": "Vindhastighet",
     }
 
     # Lag en liste med dictionaries som inneholder både felt og oversettelse
@@ -170,6 +174,8 @@ def export_csv(request):
             "humidity",
             "pressure",
             "light",
+            "wind_freq",
+            "wind_speed",
         ]
 
     response = HttpResponse(content_type="text/csv")
@@ -190,6 +196,8 @@ def export_csv(request):
                     d.humidity,
                     d.pressure,
                     d.light,
+                    d.wind_freq,
+                    d.wind_speed,
                 ]
             )
 

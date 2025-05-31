@@ -16,6 +16,8 @@ class SensorDataAdmin(admin.ModelAdmin):
         "timestamp",
         "battery",
         "battery_voltage",
+        "wind_freq",
+        "wind_speed",
     )  # Add all the fields you want to see in the list view
 
     # Controls the fields displayed when editing/creating a Group (form view)
@@ -31,7 +33,9 @@ class SensorDataAdmin(admin.ModelAdmin):
                     "pressure",
                     "light",
                     "battery",
-                    "battery_voltage"
+                    "battery_voltage",
+                    "wind_freq",
+                    "wind_speed",
                 )  # Add all fields you want in the form
             },
         ),

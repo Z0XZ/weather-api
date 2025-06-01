@@ -16,31 +16,41 @@ def voltage_to_percent(voltage: float) -> int:
         return 100
     elif voltage >= 4.15:
         return 95
-    elif voltage >= 4.10:
+    elif voltage >= 4.11:
         return 90
-    elif voltage >= 4.05:
+    elif voltage >= 4.08:
         return 85
-    elif voltage >= 4.00:
+    elif voltage >= 4.02:
         return 80
-    elif voltage >= 3.95:
+    elif voltage >= 3.98:
         return 75
-    elif voltage >= 3.90:
+    elif voltage >= 3.95:
         return 70
-    elif voltage >= 3.85:
+    elif voltage >= 3.91:
         return 65
-    elif voltage >= 3.80:
+    elif voltage >= 3.87:
         return 60
-    elif voltage >= 3.75:
+    elif voltage >= 3.85:
+        return 55
+    elif voltage >= 3.84:
         return 50
-    elif voltage >= 3.70:
+    elif voltage >= 3.82:
+        return 45
+    elif voltage >= 3.8:
         return 40
-    elif voltage >= 3.65:
+    elif voltage >= 3.79:
+        return 35
+    elif voltage >= 3.77:
         return 30
-    elif voltage >= 3.60:
+    elif voltage >= 3.75:
+        return 25
+    elif voltage >= 3.73:
         return 20
-    elif voltage >= 3.55:
+    elif voltage >= 3.71:
+        return 15
+    elif voltage >= 3.69:
         return 10
-    elif voltage >= 3.50:
+    elif voltage >= 3.61:
         return 5
     else:
         return 0
